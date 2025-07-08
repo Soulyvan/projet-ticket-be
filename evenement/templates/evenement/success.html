@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation de Paiement</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #4CAF50;
+            font-size: 28px;
+        }
+
+        p {
+            color: #555;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        .success-icon {
+            font-size: 50px;
+            color: #4CAF50;
+            margin-top: 20px;
+        }
+
+        .button {
+            background-color: #008083;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 30px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #006d64;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">&#10004;</div> <!-- ✔️ icône -->
+        <h1>Félicitations !</h1>
+        <p>Votre paiement a été effectué avec succès.</p>
+        <p>Merci pour votre achat ! Nous espérons que vous apprécierez votre expérience.</p>
+
+        <!-- Lien vers l'application mobile -->
+        <a href="myapp://event/12345" class="button">Retour à l'application</a>
+    </div>
+</body>
+</html>
