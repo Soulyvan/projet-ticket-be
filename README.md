@@ -115,19 +115,24 @@ cd projet-ticket-be
 
 ## AUTHENTIFICATION (/api/authentification/)
 
+```bash
 POST /inscription/
 {
   "email": "user@email.com",
   "password": "password123",
   "organisateur": true
 }
+```
 
+```bash
 POST /connexion/
 {
   "email": "user@email.com",
   "password": "password123"
 }
+```
 
+```bash
 POST /deconnexion/
 HEADERS:
 Authorization: Bearer <token>
@@ -135,11 +140,13 @@ Authorization: Bearer <token>
 DELETE /suppression/
 HEADERS:
 Authorization: Bearer <token>
+```
 
 ---
 
 ## EVENEMENTS (/api/evenement/)
 
+```bash
 GET /evenements/
 
 POST /evenements/
@@ -161,7 +168,9 @@ Content-Type: multipart/form-data
     }
   ]
 }
+```
 
+```bash
 GET /evenements/{id}/afficher/
 
 PUT /evenements/{id}/modifier/
@@ -171,11 +180,13 @@ Authorization: Bearer <token>
 DELETE /evenements/{id}/supprimer/
 HEADERS:
 Authorization: Bearer <token>
+```
 
 ---
 
 ## CATEGORIES
 
+```bash
 GET /evenements/categories/{evenement_id}/
 
 POST /evenements/categories/{evenement_id}/
@@ -184,15 +195,19 @@ POST /evenements/categories/{evenement_id}/
   "billets_restant": 50,
   "prix": 15000
 }
+```
 
+```bash
 GET /evenements/categories/{id}/
 
 DELETE /evenements/categories/{id}/delete/
+```
 
 ---
 
 ## PAIEMENT STRIPE
 
+```bash
 POST /qrcode/creer/
 {
   "evenement_id": 1,
@@ -200,15 +215,19 @@ POST /qrcode/creer/
   "nombre_places": 2,
   "token_user": "token"
 }
+```
 
+```bash
 POST /stripe/webhook/
 
 GET /success/
+```
 
 ---
 
 ## QR CODES
 
+```bash
 POST /qrcodes/
 {
   "token": "user_token"
@@ -221,12 +240,15 @@ Authorization: Bearer <token>
 GET /qrcode/invalide/{token}/
 HEADERS:
 Authorization: Bearer <token>
+```
 
 ---
 
 ## HISTORIQUE
 
+```bash
 GET /historique/
+```
 
 ---
 
