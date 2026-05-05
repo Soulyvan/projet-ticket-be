@@ -1,347 +1,381 @@
 <div align="center">
+  <img width="100" src="https://raw.githubusercontent.com/Soulyvan/projet-ticket-be/main/media/logo.png" alt="Logo">
   <h1>🎟️ Ticket Event API</h1>
-  <p><strong>API Backend de gestion d'événements et billetterie avec QR Codes</strong></p>
-  <p><em>Développée avec Django & Django REST Framework</em></p>
+  <p>
+    <strong>API Backend complète de billetterie événementielle</strong><br>
+    <em>Django + DRF + Stripe + QR Codes</em>
+  </p>
+  <br>
+  <img src="https://img.shields.io/badge/Django-5.0-blue?style=flat&logo=django&logoColor=white" alt="Django">
+  <img src="https://img.shields.io/badge/DRF-3.14-green?style=flat&logo=django-rest&logoColor=white" alt="DRF">
+  <img src="https://img.shields.io/badge/Stripe-635BFF?style=flat&logo=stripe&logoColor=white" alt="Stripe">
+  <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat&logo=mit" alt="License">
 </div>
 
 ---
 
-## 📋 Table des matières
+## 📖 Aperçu rapide
 
-- [Présentation](#-présentation)
-- [Fonctionnalités](#-fonctionnalités)
-- [Stack technique](#-stack-technique)
-- [Architecture](#-architecture)
-- [Installation](#-installation)
-- [Endpoints API](#-endpoints-api)
-- [Système de paiement](#-système-de-paiement)
-- [QR Codes](#-qr-codes)
-- [Système](#-système)
+**Ticket Event API** est une solution complète de billetterie pour :
+- **Organisateurs** : Créer/gérer événements
+- **Utilisateurs** : Acheter billets (Stripe)
+- **Validation** : QR Codes uniques + scan
+
+**[Démo live](http://localhost:8000) → [Documentation Swagger](http://localhost:8000/api/schema/swagger-ui/)**
 
 ---
 
-## 📖 Présentation
+## 🚀 Démarrage en 60s
 
-**Ticket Event API** est une API REST complète pour gérer un système de billetterie événementielle.
-
-### Ce que permet l'API :
-- ✅ **Organisateurs** : Créer et gérer des événements
-- ✅ **Utilisateurs** : Acheter des billets via Stripe
-- ✅ **Automatisation** : Génération QR codes uniques
-- ✅ **Validation** : Scan et gestion des billets
-
----
-
-## ⚙️ Fonctionnalités
-
-### 🔐 **Authentification**
-- Inscription avec email
-- Connexion avec token JWT
-- Déconnexion
-- Suppression de compte
-
-### 🎫 **Événements**
-- Création avec catégories de billets
-- Mise à jour / suppression
-- Gestion stock billets
-
-### 💳 **Paiement**
-- Stripe Checkout intégré
-- Webhook validation automatique
-- Mise à jour stock post-paiement
-
-### 📱 **QR Codes**
-- Génération automatique après paiement
-- QR unique par billet
-- Validation par scan
-- Invalidation
-
-### 📊 **Historique**
-- Suivi des achats
-- Tracking transactions
-
----
-
-## 🧱 Stack technique
-Technologie
-
-Version
-
-Rôle
-
-Django
-
-5.x
-
-Backend
-
-DRF
-
-3.14
-
-API REST
-
-Token Auth
-
-DRF
-
-Authentification
-
-Stripe
-
-Latest
-
-Paiements
-
-qrcode
-
-Latest
-
-QR Codes
-
-Pillow
-
-Latest
-
-Images
-
-SQLite
-
-Dev
-
-Base de données
-
-🏗️ Architecture
-2 applications principales :
-
-
-Copy code
-authentification/
-├── CustomUser (rôle organisateur)
-└── Token Authentication
-
-evenement/
-├── Evenement
-├── CategorieEvenement
-├── QRCode
-├── Paiement Stripe
-└── Historique
-📦 Installation
-bash
-
-Copy code
+```bash
+# Clone & setup
 git clone https://github.com/Soulyvan/projet-ticket-be.git
 cd projet-ticket-be
 
-# Environnement virtuel
+# Environnement
 python -m venv venv
 source venv/bin/activate  # Linux/Mac
-# venv\Scripts\activate   # Windows
+# venv\Scripts\activate    # Windows
 
 pip install -r requirements.txt
+cp .env.example .env
 python manage.py migrate
 python manage.py runserver
-URL API : http://localhost:8000
+✅ API prête : http://localhost:8000
+
+🧪 Test rapide
+bash
+
+Copy code
+# 1. S'inscrire (organisateur)
+curl -X POST http://localhost:8000/api/authentification/inscription/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test@organisateur.com",
+    "password": "motdepasse123",
+    "organisateur": true
+  }'
+
+# 2. Se connecter
+curl -X POST http://localhost:8000/api/authentification/connexion/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test@organisateur.com", 
+    "password": "motdepasse123"
+  }'
+Sauvegardez le TOKEN reçu ! 👇
 
 🔐 Authentification
-Base URL : /api/authentification/
+Endpoint
 
-1. Inscription
+Méthode
+
+Auth
+
+Description
+
+/api/authentification/inscription/
+
+POST
+
+❌
+
+Créer compte
+
+/api/authentification/connexion/
+
+POST
+
+❌
+
+Obtenir token
+
+/api/authentification/deconnexion/
+
+POST
+
+✅
+
+Logout
+
+/api/authentification/suppression/
+
+DELETE
+
+✅
+
+Supprimer compte
+
+Headers obligatoires (endpoints protégés) :
+
 bash
 
 Copy code
-POST /inscription/
+Authorization: Bearer VOTRE_TOKEN
+Content-Type: application/json
+Exemple inscription :
+
 json
 
 Copy code
 {
-  "email": "user@email.com",
-  "password": "password123",
+  "email": "user@example.com",
+  "password": "MonMotDePasse123!",
   "organisateur": true
 }
-2. Connexion
-bash
-
-Copy code
-POST /connexion/
-json
-
-Copy code
-{
-  "email": "user@email.com",
-  "password": "password123"
-}
-Réponse : {"token": "votre_token"}
-
-3. Headers pour endpoints protégés
-
-Copy code
-Authorization: Bearer votre_token
-Content-Type: application/json
-4. Autres
-bash
-
-Copy code
-POST /deconnexion/
-DELETE /suppression/
 🎪 Événements
-Base URL : /api/evenement/
+Endpoint
 
-Lister événements
+Méthode
+
+Auth
+
+Description
+
+/api/evenement/evenements/
+
+GET
+
+❌
+
+Lister tous
+
+/api/evenement/evenements/
+
+POST
+
+✅
+
+Créer
+
+/api/evenement/evenements/{id}/afficher/
+
+GET
+
+❌
+
+Détails
+
+/api/evenement/evenements/{id}/modifier/
+
+PUT
+
+✅
+
+Modifier
+
+/api/evenement/evenements/{id}/supprimer/
+
+DELETE
+
+✅
+
+Supprimer
+
+Créer un événement :
+
 bash
 
 Copy code
-GET /evenements/
-Créer événement
-bash
+curl -X POST http://localhost:8000/api/evenement/evenements/ \
+  -H "Authorization: Bearer VOTRE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nom": "Concert Live",
+    "type_evenement": "concert",
+    "date_heure": "2026-01-15T20:00:00Z",
+    "lieu": "Arena Dakar",
+    "description": "Concert exceptionnel",
+    "categories": [
+      {
+        "nom": "VIP",
+        "billets_restant": 50,
+        "prix": 25000
+      },
+      {
+        "nom": "Standard",
+        "billets_restant": 200,
+        "prix": 15000
+      }
+    ]
+  }'
+🏷️ Catégories de billets
+Endpoint
 
-Copy code
-POST /evenements/
+Méthode
+
+Auth
+
+Description
+
+/api/evenement/evenements/categories/{evenement_id}/
+
+GET/POST
+
+✅
+
+Lister/Créer
+
+/api/evenement/categories/{id}/
+
+GET
+
+❌
+
+Détails
+
+/api/evenement/categories/{id}/delete/
+
+DELETE
+
+✅
+
+Supprimer
+
+Ajouter catégorie :
+
 json
 
 Copy code
 {
-  "nom": "Concert",
-  "type_evenement": "concert",
-  "date_heure": "2026-01-01T20:00:00Z",
-  "lieu": "Dakar",
-  "description": "Event description",
-  "categories": [
-    {
-      "nom": "VIP",
-      "billets_restant": 100,
-      "prix": 10000
-    }
-  ]
+  "nom": "Première Rangée",
+  "billets_restant": 20,
+  "prix": 35000
 }
-Headers : Authorization: Bearer <token>
-
-Gérer un événement
+💳 Paiement Stripe
+1. Lancer checkout (utilisateur)
 bash
 
 Copy code
-GET    /evenements/{id}/afficher/
-PUT    /evenements/{id}/modifier/
-DELETE /evenements/{id}/supprimer/
-🏷️ Catégories
-bash
+curl -X POST http://localhost:8000/api/qrcode/creer/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "evenement_id": 1,
+    "categorie_evenement_nom": "VIP",
+    "nombre_places": 2,
+    "token_user": "USER_TOKEN"
+  }'
+Réponse : { "url": "https://checkout.stripe.com/..." }
+
+2. Webhook (automatique)
 
 Copy code
-# Pour un événement spécifique
-GET  /evenements/categories/{evenement_id}/
-POST /evenements/categories/{evenement_id}/
+POST /api/stripe/webhook/
+Génère QR codes après paiement réussi
 
-# Gérer une catégorie
-GET    /evenements/categories/{id}/
-DELETE /evenements/categories/{id}/delete/
-Exemple création :
-
-json
-
-Copy code
-{
-  "nom": "VIP",
-  "billets_restant": 50,
-  "prix": 15000
-}
-💳 Système de paiement
-1. Créer session paiement
-bash
-
-Copy code
-POST /qrcode/creer/
-json
-
-Copy code
-{
-  "evenement_id": 1,
-  "categorie_evenement_nom": "VIP",
-  "nombre_places": 2,
-  "token_user": "user_token"
-}
-Réponse : URL Stripe Checkout
-
-2. Webhook Stripe (automatique)
-bash
-
-Copy code
-POST /stripe/webhook/
 3. Succès
-bash
 
 Copy code
 GET /success/
 📱 QR Codes
-Action
-
 Endpoint
+
+Méthode
 
 Auth
 
-Lister
+Description
 
-POST /qrcodes/
+/api/qrcodes/
+
+POST
 
 ✅
 
-Afficher
+Lister mes QR
 
-GET /qrcode/{token}/
+/api/qrcode/{token}/
+
+GET
+
+✅
+
+Afficher QR
+
+/api/qrcode/invalide/{token}/
+
+GET
 
 ✅
 
 Invalider
 
-GET /qrcode/invalide/{token}/
-
-✅
-
-Exemple requête :
+Lister QR :
 
 json
 
 Copy code
 {
-  "token": "user_token"
+  "token": "USER_TOKEN"
 }
-1 QR Code = 1 billet unique
+✅ 1 QR Code = 1 billet unique
 
 📊 Historique
 bash
 
 Copy code
-GET /historique/
-⚙️ Système
+curl -H "Authorization: Bearer VOTRE_TOKEN" \
+  http://localhost:8000/api/historique/
+🛠️ Configuration
+.env (obligatoire)
+env
+
+Copy code
+SECRET_KEY=django-insecure-your-secret-key-here
+DEBUG=True
+STRIPE_PUBLIC_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+Scripts utiles
+bash
+
+Copy code
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+🔒 Sécurité & Features
 Fonctionnalité
 
-Description
+Statut
 
-Auth
+Token DRF
 
-Token Authentication (DRF)
+✅
 
-Paiement
+CORS
 
-Stripe Checkout
+✅
 
-QR
+Rate Limiting
 
-Génération auto post-paiement
+✅
 
-Stock
+Stock temps réel
 
-Mise à jour après achat
+✅
 
-Middleware
+Middleware cleanup ✅
 
-Suppression événements expirés
+Signals images ✅
 
-Signals
-
-Nettoyage images auto
-
+📈 Roadmap
+[ ] Google OAuth
+[ ] Notifications Email/SMS
+[ ] Dashboard Analytics
+[ ] Docker
+[ ] Tests E2E
 <div align="center">
-👨‍💻 Développé par Soulyvan
+🤝 Contribuer
+bash
+
+Copy code
+git clone https://github.com/Soulyvan/projet-ticket-be.git
+# → Créez une PR !
+⭐ Star si utile !
+
 GitHub
+Twitter
+
+© 2024 Soulyvan - MIT License
 
 </div> ```
