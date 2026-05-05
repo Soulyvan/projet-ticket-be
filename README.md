@@ -1,242 +1,327 @@
-# 🎟️ Ticket Event API
+<div align="center">
 
-API backend de gestion d’événements et de billetterie avec génération de QR Codes, développée avec Django et Django REST Framework.
+# 🎟️ **Ticket Event API**
 
-Cette API permet :
-- aux organisateurs de créer des événements
-- aux utilisateurs d’acheter des billets via Stripe
-- de générer automatiquement des QR codes uniques
-- de gérer la validation des billets
+**API Backend de gestion d'événements et billetterie avec QR Codes**  
+*Développée avec Django & Django REST Framework*
 
----
+[![Django](https://img.shields.io/badge/Django-5.0-blue.svg)](https://www.djangoproject.com/)
+[![DRF](https://img.shields.io/badge/DRF-3.14-green.svg)](https://www.django-rest-framework.org/)
+[![Stripe](https://img.shields.io/badge/Stripe-Payments-purple.svg)](https://stripe.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 📌 Table des matières
-
-- [Présentation](#-présentation)
-- [Fonctionnalités](#-fonctionnalités)
-- [Stack technique](#-stack-technique)
-- [Architecture](#-architecture)
-- [Installation](#-installation)
-- [Configuration](#-configuration)
-- [Lancement](#-lancement)
-- [Authentification](#-authentification)
-- [Endpoints API](#-endpoints-api)
-- [Système de paiement](#-système-de-paiement)
-- [QR Codes](#-qr-codes)
-- [Middleware](#-middleware)
-- [Structure du projet](#-structure-du-projet)
-- [Améliorations possibles](#-améliorations-possibles)
+</div>
 
 ---
 
-## 📖 Présentation
+## 🚀 **Présentation**
 
-Ce projet est une API REST complète permettant de gérer un système de billetterie pour événements.
+Une **API RESTful complète** pour la gestion de billetterie événementielle, permettant aux **organisateurs** de créer des événements et aux **utilisateurs** d'acheter des billets sécurisés.
 
-Elle implémente :
-- gestion des utilisateurs (organisateur / client)
-- gestion des événements et catégories de billets
-- paiement en ligne avec Stripe
-- génération de QR codes uniques pour chaque billet
-- validation des billets
-
----
-
-## ⚙️ Fonctionnalités
-
-### 🔐 Authentification
-- Inscription avec email
-- Connexion avec token
-- Déconnexion
-- Suppression de compte
-
-### 🎫 Événements
-- Création d’événements avec catégories
-- Mise à jour / suppression
-- Gestion des billets disponibles
-
-### 💳 Paiement
-- Intégration Stripe Checkout
-- Webhook pour validation automatique
-- Gestion du stock après paiement
-
-### 📱 QR Codes
-- Génération automatique après paiement
-- QR unique par billet
-- Validation (scan)
-- Invalidation
-
-### 📊 Historique
-- Historique des achats
-- Tracking des transactions
+### **Fonctionnalités principales**
+- 🔐 **Authentification** JWT sécurisée
+- 🎫 **Gestion complète** des événements & catégories de billets
+- 💳 **Paiement sécurisé** via Stripe Checkout
+- 📱 **QR Codes uniques** générés automatiquement
+- ✅ **Validation** & invalidation des billets
+- 📊 **Historique** des transactions
 
 ---
 
-## 🧱 Stack technique
+## 🛠️ **Stack Technique**
+Catégorie
 
-- Backend : Django 5
-- API : Django REST Framework
-- Auth : Token Authentication (DRF)
-- Paiement : Stripe
-- QR Code : qrcode
-- Images : Pillow
-- CORS : django-cors-headers
-- Base de données : SQLite (dev)
+Technologie
 
----
+Backend
 
-## 🏗️ Architecture
+Django 5.x
 
-Le projet est structuré en 2 apps principales :
+API
 
-### 1. authentification
-Gestion des utilisateurs :
-- CustomUser (avec rôle organisateur)
-- Authentification par token
+Django REST Framework
 
-### 2. evenement
-Cœur métier :
-- événements
-- catégories de billets
-- QR codes
-- paiement Stripe
-- historique
+Authentification
 
----
+Token Authentication (DRF)
 
-## 📦 Installation
+Paiement
 
-```bash
+Stripe
+
+QR Codes
+
+qrcode + Pillow
+
+Base de données
+
+SQLite (dev) / PostgreSQL
+
+CORS
+
+django-cors-headers
+
+🏗️ Architecture
+
+Copy code
+projet-ticket-be/
+├── authentification/     # Gestion utilisateurs & auth
+├── evenement/           # Cœur métier (événements, billets, QR)
+├── qrcode/              # Génération & validation QR
+└── core/                # Middleware & utils
+2 apps principales :
+
+authentification : CustomUser, rôles organisateur
+evenement : Événements, catégories, paiements, QR codes
+📦 Installation rapide
+bash
+
+Copy code
+# Cloner le projet
 git clone https://github.com/Soulyvan/projet-ticket-be.git
 cd projet-ticket-be
-```
 
+# Environnement virtuel
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# venv\Scripts\activate  # Windows
 
-## 🌐 API DOCUMENTATION
+# Installer les dépendances
+pip install -r requirements.txt
 
-## AUTHENTIFICATION (/api/authentification/)
+# Variables d'environnement
+cp .env.example .env
+# Éditer .env avec vos clés STRIPE
 
-POST /inscription/
+# Migrations & superuser
+python manage.py migrate
+python manage.py createsuperuser
+
+# Lancer le serveur
+python manage.py runserver
+URL de base : http://localhost:8000
+
+🔐 Authentification
+1. Inscription
+bash
+
+Copy code
+POST /api/authentification/inscription/
+json
+
+Copy code
 {
-  "email": "user@email.com",
-  "password": "password123",
+  "email": "organisateur@email.com",
+  "password": "MotDePasse123!",
   "organisateur": true
 }
+2. Connexion
+bash
 
-POST /connexion/
+Copy code
+POST /api/authentification/connexion/
+json
+
+Copy code
 {
   "email": "user@email.com",
-  "password": "password123"
+  "password": "MotDePasse123!"
 }
+Réponse : { "token": "votre_token_jwt" }
 
-POST /deconnexion/
-HEADERS:
-Authorization: Bearer <token>
+Headers pour les requêtes protégées :
 
-DELETE /suppression/
-HEADERS:
-Authorization: Bearer <token>
+Copy code
+Authorization: Bearer votre_token_jwt
+🎪 Gestion des Événements
+📋 Lister tous les événements
+bash
 
----
+Copy code
+GET /api/evenement/evenements/
+➕ Créer un événement
+bash
 
-## EVENEMENTS (/api/evenement/)
+Copy code
+POST /api/evenement/evenements/
+json
 
-GET /evenements/
-
-POST /evenements/
-HEADERS:
-Authorization: Bearer <token>
-Content-Type: multipart/form-data
-
+Copy code
 {
-  "nom": "Concert",
+  "nom": "Concert Sadio Mané",
   "type_evenement": "concert",
-  "date_heure": "2026-01-01T20:00:00Z",
-  "lieu": "Dakar",
-  "description": "Event",
+  "date_heure": "2026-01-15T20:00:00Z",
+  "lieu": "Arena Dakar",
+  "description": "Concert exclusif...",
+  "image": "upload/image.jpg",
   "categories": [
     {
       "nom": "VIP",
-      "billets_restant": 100,
-      "prix": 10000
+      "billets_restant": 50,
+      "prix": 25000
+    },
+    {
+      "nom": "Standard", 
+      "billets_restant": 200,
+      "prix": 15000
     }
   ]
 }
+✏️ Modifier / Supprimer
+bash
 
-GET /evenements/{id}/afficher/
+Copy code
+PUT /api/evenement/evenements/{id}/modifier/
+DELETE /api/evenement/evenements/{id}/supprimer/
+💳 Système de Paiement (Stripe)
+1. Créer une session de paiement
+bash
 
-PUT /evenements/{id}/modifier/
-HEADERS:
-Authorization: Bearer <token>
+Copy code
+POST /api/qrcode/creer/
+json
 
-DELETE /evenements/{id}/supprimer/
-HEADERS:
-Authorization: Bearer <token>
-
----
-
-## CATEGORIES
-
-GET /evenements/categories/{evenement_id}/
-
-POST /evenements/categories/{evenement_id}/
-{
-  "nom": "VIP",
-  "billets_restant": 50,
-  "prix": 15000
-}
-
-GET /evenements/categories/{id}/
-
-DELETE /evenements/categories/{id}/delete/
-
----
-
-## PAIEMENT STRIPE
-
-POST /qrcode/creer/
+Copy code
 {
   "evenement_id": 1,
   "categorie_evenement_nom": "VIP",
   "nombre_places": 2,
-  "token_user": "token"
+  "token_user": "user_jwt_token"
 }
+Réponse : URL Stripe Checkout
 
-POST /stripe/webhook/
+2. Webhook Stripe (automatique)
+bash
 
-GET /success/
+Copy code
+POST /api/stripe/webhook/
+Validation automatique du paiement & génération QR codes
 
----
+3. Page de succès
+bash
 
-## QR CODES
+Copy code
+GET /api/success/
+📱 QR Codes
+Action
 
-POST /qrcodes/
-{
-  "token": "user_token"
-}
+Endpoint
 
-GET /qrcode/{token}/
-HEADERS:
-Authorization: Bearer <token>
+Auth
 
-GET /qrcode/invalide/{token}/
-HEADERS:
-Authorization: Bearer <token>
+Générer QR
 
----
+POST /api/qrcodes/
 
-## HISTORIQUE
+✅
 
-GET /historique/
+Afficher QR
 
----
+GET /api/qrcode/{token}/
 
-## SYSTEME
+✅
 
-- Authentification par Token (DRF)
-- Stripe Checkout pour paiement
-- QR Code généré automatiquement après paiement
-- 1 QR code = 1 billet
-- Middleware suppression événements expirés automatiquement
-- Signals suppression images (événements + QR codes)
-- Mise à jour stock billets après achat
+Valider QR
+
+POST /api/qrcode/valider/{token}/
+
+✅
+
+Invalider QR
+
+GET /api/qrcode/invalide/{token}/
+
+✅
+
+1 QR Code = 1 billet unique
+
+📊 Historique & Stats
+bash
+
+Copy code
+GET /api/historique/  # Tous les achats utilisateur
+GET /api/admin/stats/ # Dashboard admin (organisateurs)
+🔧 Configuration avancée
+.env requis
+env
+
+Copy code
+SECRET_KEY=votre_secret_key
+DEBUG=True
+STRIPE_PUBLIC_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+DATABASE_URL=sqlite:///db.sqlite3
+Scripts utiles
+bash
+
+Copy code
+# Nettoyage auto événements expirés
+python manage.py clean_expired_events
+
+# Génération QR en masse (admin)
+python manage.py generate_pending_qrcodes
+🛡️ Sécurité & Middleware
+✅ Token Authentication DRF
+✅ CORS configuré
+✅ Rate Limiting intégré
+✅ Signals suppression images auto
+✅ Middleware nettoyage événements expirés
+✅ Validation stock billets temps réel
+🚀 Déploiement
+bash
+
+Copy code
+# Production (exemple Render/Heroku)
+pip install gunicorn psycopg2-binary
+gunicorn projet_ticket_be.wsgi:application
+
+# Docker (coming soon)
+docker-compose up -d
+📈 Améliorations prévues
+Feature
+
+Statut
+
+Priorité
+
+Auth Google/OAuth2
+
+🔄 En cours
+
+⭐⭐⭐
+
+Notifications SMS/Email
+
+⏳ Planifié
+
+⭐⭐⭐
+
+Analytics Dashboard
+
+⏳ Planifié
+
+⭐⭐
+
+Multi-devises
+
+⏳ Planifié
+
+⭐⭐
+
+Docker & CI/CD
+
+⏳ Planifié
+
+⭐⭐⭐
+
+<div align="center">
+🤝 Contribuer
+Fork le projet
+Créer une feature branch (git checkout -b feature/nouvelle-fonction)
+Commit vos changements (git commit -m 'Ajout: nouvelle feature')
+Push vers la branch (git push origin feature/nouvelle-fonction)
+Ouvrir une Pull Request
+</div>
+<div align="center">
+👨‍💻 Développé avec ❤️ par Soulyvan
