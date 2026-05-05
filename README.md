@@ -1,327 +1,227 @@
 <div align="center">
-
-# 🎟️ **Ticket Event API**
-
-**API Backend de gestion d'événements et billetterie avec QR Codes**  
-*Développée avec Django & Django REST Framework*
-
-[![Django](https://img.shields.io/badge/Django-5.0-blue.svg)](https://www.djangoproject.com/)
-[![DRF](https://img.shields.io/badge/DRF-3.14-green.svg)](https://www.django-rest-framework.org/)
-[![Stripe](https://img.shields.io/badge/Stripe-Payments-purple.svg)](https://stripe.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
+  <img src="https://user-images.githubusercontent.com/123456/200000000.png" alt="Ticket Event API" width="800"/>
+  <h1>🎟️ Ticket Event API</h1>
+  <p><strong>API Backend de gestion d'événements et billetterie avec QR Codes</strong></p>
+  <p><em>Développée avec Django & Django REST Framework</em></p>
+  
+  <img alt="Django" src="https://img.shields.io/badge/Django-5.0-092E20?style=for-the-badge&logo=django&logoColor=white">
+  <img alt="DRF" src="https://img.shields.io/badge/DRF-3.14-00D775?style=for-the-badge&logo=django-rest-framework&logoColor=white">
+  <img alt="Stripe" src="https://img.shields.io/badge/Stripe-%2363B8EE?style=for-the-badge&logo=stripe&logoColor=white">
+  <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" style="height: 23px;">
 </div>
 
----
+<br>
 
-## 🚀 **Présentation**
+## ✨ **Fonctionnalités**
+🔐 **Authentification
 
-Une **API RESTful complète** pour la gestion de billetterie événementielle, permettant aux **organisateurs** de créer des événements et aux **utilisateurs** d'acheter des billets sécurisés.
+🎫 **Événements
 
-### **Fonctionnalités principales**
-- 🔐 **Authentification** JWT sécurisée
-- 🎫 **Gestion complète** des événements & catégories de billets
-- 💳 **Paiement sécurisé** via Stripe Checkout
-- 📱 **QR Codes uniques** générés automatiquement
-- ✅ **Validation** & invalidation des billets
-- 📊 **Historique** des transactions
+💳 **Paiement
 
----
+📱 **QR Codes
 
-## 🛠️ **Stack Technique**
-Catégorie
+Inscription email
 
-Technologie
+Création événements
 
-Backend
+Stripe Checkout
 
-Django 5.x
+Génération auto
 
-API
+Connexion token
 
-Django REST Framework
+Catégories billets
 
-Authentification
+Webhook sécurisé
 
-Token Authentication (DRF)
+Validation scan
 
-Paiement
+Rôles organisateur
 
-Stripe
+Gestion stock
 
-QR Codes
+Stock auto
 
-qrcode + Pillow
+1 QR = 1 billet
 
-Base de données
-
-SQLite (dev) / PostgreSQL
-
-CORS
-
-django-cors-headers
-
-🏗️ Architecture
+🛠️ Stack Technique
+mermaid
 
 Copy code
-projet-ticket-be/
-├── authentification/     # Gestion utilisateurs & auth
-├── evenement/           # Cœur métier (événements, billets, QR)
-├── qrcode/              # Génération & validation QR
-└── core/                # Middleware & utils
-2 apps principales :
-
-authentification : CustomUser, rôles organisateur
-evenement : Événements, catégories, paiements, QR codes
-📦 Installation rapide
+graph TD
+    A[Django 5.x] --> B[DRF API]
+    B --> C[Token Auth]
+    C --> D[Stripe Paiement]
+    D --> E[QR Codes]
+    E --> F[SQLite/PostgreSQL]
+🚀 Démarrage rapide (2 min ⏱️)
 bash
 
 Copy code
-# Cloner le projet
 git clone https://github.com/Soulyvan/projet-ticket-be.git
 cd projet-ticket-be
-
-# Environnement virtuel
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# venv\Scripts\activate  # Windows
-
-# Installer les dépendances
 pip install -r requirements.txt
-
-# Variables d'environnement
 cp .env.example .env
-# Éditer .env avec vos clés STRIPE
-
-# Migrations & superuser
+# Ajouter tes clés Stripe
 python manage.py migrate
-python manage.py createsuperuser
-
-# Lancer le serveur
 python manage.py runserver
-URL de base : http://localhost:8000
+API prête : http://localhost:8000
 
 🔐 Authentification
-1. Inscription
 bash
 
 Copy code
-POST /api/authentification/inscription/
+# 1. Inscription
+curl -X POST http://localhost:8000/api/authentification/inscription/ \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@email.com","password":"123456","organisateur":true}'
+
+# 2. Connexion
+curl -X POST http://localhost:8000/api/authentification/connexion/ \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@email.com","password":"123456"}'
+Token reçu → Authorization: Bearer ton_token
+
+🎪 Endpoints Principaux
+Méthode
+
+Endpoint
+
+Description
+
+Auth
+
+GET
+
+/api/evenement/evenements/
+
+Lister événements
+
+❌
+
+POST
+
+/api/evenement/evenements/
+
+Créer événement
+
+✅
+
+POST
+
+/api/qrcode/creer/
+
+Paiement Stripe
+
+✅
+
+GET
+
+/api/qrcode/{token}/
+
+Afficher QR
+
+✅
+
+POST
+
+/api/qrcode/valider/{token}/
+
+Valider billet
+
+✅
+
+💳 Exemple : Acheter un billet
 json
-
-Copy code
-{
-  "email": "organisateur@email.com",
-  "password": "MotDePasse123!",
-  "organisateur": true
-}
-2. Connexion
-bash
-
-Copy code
-POST /api/authentification/connexion/
-json
-
-Copy code
-{
-  "email": "user@email.com",
-  "password": "MotDePasse123!"
-}
-Réponse : { "token": "votre_token_jwt" }
-
-Headers pour les requêtes protégées :
-
-Copy code
-Authorization: Bearer votre_token_jwt
-🎪 Gestion des Événements
-📋 Lister tous les événements
-bash
-
-Copy code
-GET /api/evenement/evenements/
-➕ Créer un événement
-bash
-
-Copy code
-POST /api/evenement/evenements/
-json
-
-Copy code
-{
-  "nom": "Concert Sadio Mané",
-  "type_evenement": "concert",
-  "date_heure": "2026-01-15T20:00:00Z",
-  "lieu": "Arena Dakar",
-  "description": "Concert exclusif...",
-  "image": "upload/image.jpg",
-  "categories": [
-    {
-      "nom": "VIP",
-      "billets_restant": 50,
-      "prix": 25000
-    },
-    {
-      "nom": "Standard", 
-      "billets_restant": 200,
-      "prix": 15000
-    }
-  ]
-}
-✏️ Modifier / Supprimer
-bash
-
-Copy code
-PUT /api/evenement/evenements/{id}/modifier/
-DELETE /api/evenement/evenements/{id}/supprimer/
-💳 Système de Paiement (Stripe)
-1. Créer une session de paiement
-bash
 
 Copy code
 POST /api/qrcode/creer/
-json
-
-Copy code
 {
   "evenement_id": 1,
   "categorie_evenement_nom": "VIP",
   "nombre_places": 2,
-  "token_user": "user_jwt_token"
+  "token_user": "user_token"
 }
-Réponse : URL Stripe Checkout
+→ Redirection Stripe Checkout → QR généré automatiquement !
 
-2. Webhook Stripe (automatique)
-bash
+🛡️ Sécurité incluse
+✅ Token Authentication DRF
+✅ CORS configuré
+✅ Rate Limiting
+✅ Signals suppression images
+✅ Middleware auto-cleanup
+✅ Stock temps réel
 
-Copy code
-POST /api/stripe/webhook/
-Validation automatique du paiement & génération QR codes
-
-3. Page de succès
-bash
-
-Copy code
-GET /api/success/
-📱 QR Codes
-Action
-
-Endpoint
-
-Auth
-
-Générer QR
-
-POST /api/qrcodes/
-
-✅
-
-Afficher QR
-
-GET /api/qrcode/{token}/
-
-✅
-
-Valider QR
-
-POST /api/qrcode/valider/{token}/
-
-✅
-
-Invalider QR
-
-GET /api/qrcode/invalide/{token}/
-
-✅
-
-1 QR Code = 1 billet unique
-
-📊 Historique & Stats
-bash
+📊 Base de données
+sql
 
 Copy code
-GET /api/historique/  # Tous les achats utilisateur
-GET /api/admin/stats/ # Dashboard admin (organisateurs)
-🔧 Configuration avancée
-.env requis
+-- Modèles principaux
+CustomUser (email, role_organisateur)
+Evenement (nom, date, lieu, image)
+CategorieEvenement (nom, prix, billets_restant)
+QRCode (token_unique, valide, user)
+Transaction (stripe_id, montant, statut)
+🔧 Configuration .env
 env
 
 Copy code
-SECRET_KEY=votre_secret_key
+SECRET_KEY=your-secret-key-here
 DEBUG=True
 STRIPE_PUBLIC_KEY=pk_test_...
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
-DATABASE_URL=sqlite:///db.sqlite3
-Scripts utiles
+ALLOWED_HOSTS=localhost,127.0.0.1
+🚀 Déploiement Production
 bash
 
 Copy code
-# Nettoyage auto événements expirés
-python manage.py clean_expired_events
-
-# Génération QR en masse (admin)
-python manage.py generate_pending_qrcodes
-🛡️ Sécurité & Middleware
-✅ Token Authentication DRF
-✅ CORS configuré
-✅ Rate Limiting intégré
-✅ Signals suppression images auto
-✅ Middleware nettoyage événements expirés
-✅ Validation stock billets temps réel
-🚀 Déploiement
-bash
-
-Copy code
-# Production (exemple Render/Heroku)
+# 1. PostgreSQL + Gunicorn
 pip install gunicorn psycopg2-binary
-gunicorn projet_ticket_be.wsgi:application
 
-# Docker (coming soon)
+# 2. Render/Heroku/Vercel
+gunicorn projet_ticket_be.wsgi
+
+# 3. Docker (bientôt)
 docker-compose up -d
-📈 Améliorations prévues
-Feature
+📈 Roadmap
+v2.0
 
-Statut
+v2.1
 
-Priorité
+v3.0
 
-Auth Google/OAuth2
+Google Auth
 
-🔄 En cours
+SMS/Email
 
-⭐⭐⭐
-
-Notifications SMS/Email
-
-⏳ Planifié
-
-⭐⭐⭐
-
-Analytics Dashboard
-
-⏳ Planifié
-
-⭐⭐
+Dashboard
 
 Multi-devises
 
-⏳ Planifié
+Analytics
 
-⭐⭐
+Mobile App
 
-Docker & CI/CD
+Docker
 
-⏳ Planifié
+PDF Tickets
 
-⭐⭐⭐
+Webhooks
 
 <div align="center">
 🤝 Contribuer
-Fork le projet
-Créer une feature branch (git checkout -b feature/nouvelle-fonction)
-Commit vos changements (git commit -m 'Ajout: nouvelle feature')
-Push vers la branch (git push origin feature/nouvelle-fonction)
-Ouvrir une Pull Request
-</div>
-<div align="center">
-👨‍💻 Développé avec ❤️ par Soulyvan
+bash
+
+Copy code
+git clone https://github.com/Soulyvan/projet-ticket-be.git
+# Crée ta feature branch
+# Commit & PR
+⭐ Star si utile !
+
+Footer
+
+👨‍💻 par Soulyvan | 📧 soulyvan@email.com
+
+</div> ```
